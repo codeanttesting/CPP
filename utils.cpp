@@ -1,101 +1,40 @@
-/* utils.cpp */
-/* Utility functions intentionally violating MISRA C++ 2013 guidelines */
-
 #include <iostream>
-#include <cstdio>
+#include <memory>   // For std::unique_ptr and std::auto_ptr
 #include <cstdlib>
-#include <cstring>
 
-using namespace std;  // MISRA violation: using-directive in global scope
+#pragma message("Compiling module3.cpp") // Violation: The #pragma directive shall not be used.
 
-// Function that returns a pointer to a local variable (violation)
-char* utilFunction(const char* str)
-{
-    char localArray[50];
-    // Unsafe use of sprintf (no bounds checking)
-    sprintf(localArray, "Util says: %s", str);
-    cout << "Inside utilFunction: " << localArray << endl;
-    
-    // Returning address of a local array (lifetime issue)
-    return localArray;
-}
+// Violation: Using an undefined macro identifier in a preprocessor directive.
+#if UNDEFINED_MACRO
+#error "Undefined macro used in preprocessor condition"
+#endif
 
-// Function that uses dynamic memory allocation unsafely
-char* allocateString(const char* input)
-{
-    char* newString;
-    // Violating MISRA by not checking the allocation result
-    newString = new char[strlen(input) + 1];
-    strcpy(newString, input);  // Unsafe use of strcpy
-    return newString;
-}
+// Violation: Function-like macro whose argument contains tokens resembling preprocessor directives.
+#define BAD_MACRO(arg) (arg)
+#define PREPROCESS_MACRO(x) BAD_MACRO( "#define " #x )
 
-int computeValue(int a, int b)
-{
-    int result;
-    // Implicit conversion and unsafe use of a primitive type
-    unsigned int temp = a;
-    result = temp + b;
-    
-    // Unbraced if-else statement
-    if (a > b)
-        result += 10;
-    else
-        result -= 10;
+// Violation: The std::auto_ptr shall not be used.
+std::auto_ptr<int> autoPtr(new int(10));
 
-    // Use of a magic number
-    result += 99;
-
-    // Filler loop with output
-    for (int i = 0; i < 20; i++) {
-        cout << "Compute filler iteration " << i << ", result = " << result << endl;
+class TemplateClass {
+public:
+    // Violation: Template constructor with a single generic parameter is defined without a copy constructor.
+    template<typename T>
+    TemplateClass(T value) {
+        std::cout << "TemplateClass constructed with value: " << value << std::endl;
     }
-    return result;
+};
+
+// Violation: The std::unique_ptr shall not be passed by const reference.
+void useUniquePtr(const std::unique_ptr<int>& uptr) {
+    std::cout << "Unique pointer value: " << *uptr << std::endl;
 }
 
-void utilFiller()
-{
-    for (int i = 0; i < 10; i++) {
-        cout << "Util filler line: " << i << endl;
-    }
-}
+int main() {
+    std::cout << PREPROCESS_MACRO(test) << std::endl; // Invocation of a problematic macro.
+    TemplateClass obj(42);
+    std::unique_ptr<int> uniquePtr(new int(5));
+    useUniquePtr(uniquePtr);
 
-void utilExtra()
-{
-    int j = 0;
-    while (j < 5)
-    {
-        cout << "Util extra line: " << j << endl;
-        j++;
-    }
-}
-
-void utilDummy()
-{
-    for (int k = 0; k < 10; k++) {
-        cout << "Util dummy line: " << k << endl;
-    }
-}
-
-void utilFinalFiller()
-{
-    for (int i = 0; i < 15; i++) {
-        cout << "Util final filler: " << i << endl;
-    }
-}
-
-// Additional filler function
-void utilMoreFiller()
-{
-    for (int i = 0; i < 10; i++) {
-        cout << "Util more filler: " << i << endl;
-    }
-}
-
-// Final extra filler to exceed 50 lines
-void utilFinalExtra()
-{
-    for (int i = 0; i < 10; i++) {
-        cout << "Util final extra line: " << i << endl;
-    }
+    return 0;
 }

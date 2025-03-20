@@ -1,106 +1,78 @@
-/* module.cpp */
-/* Example module that intentionally violates MISRA C++ 2013 guidelines */
-
 #include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <cstdlib> // Violation: Use of atoi from <cstdlib> is disallowed by AUTOSAR.
 
-using namespace std;  // MISRA violation: using-directive in global scope
-
-// Forward declaration of a function from utils.cpp
-extern char* utilFunction(const char* str);
-
-// Global variable (non-const, global namespace) – MISRA violation
-int globalCounter = 0;
-
-int moduleFunction(int param)
-{
-    int localVar = 0;
-    int i;
-
-    // Using magic numbers directly
-    if (param > 5)
-        localVar = param * 7;  // Magic number 7
-    else
-        localVar = param + 3;  // Magic number 3
-
-    // Unsafe use of strcpy on a fixed-size array
-    char buffer[20];
-    strcpy(buffer, "This string is too long for buffer");  // Risky copy
-
-    cout << "Buffer: " << buffer << endl;
-
-    // Unbraced if-else statement
-    if (param == 10)
-        cout << "Parameter is 10" << endl;
-    else
-        cout << "Parameter is not 10" << endl;
-
-    // Call utility function from utils.cpp
-    char* returnedString = utilFunction("Module call");
-    cout << "Util function returned: " << returnedString << endl;
-
-    // Modify global variable without protection
-    globalCounter++;
-    for (i = 0; i < param; i++) {
-        localVar += i;
+// Violation: In a namespace, the identifier of a static function shall not be reused.
+namespace MyNamespace {
+    static void helper() {
+        std::cout << "Helper function version 1" << std::endl;
     }
-
-    // Additional filler loop
-    for (i = 0; i < 10; i++) {
-        cout << "Filler loop iteration " << i << endl;
-    }
-
-    // Another magic number usage
-    localVar += 42;
-
-    if (localVar > 100)
-    {
-        cout << "Local variable is greater than 100" << endl;
-    }
-    else
-    {
-        cout << "Local variable is not greater than 100" << endl;
-    }
-
-    // More filler loops (unbraced single-statement loop)
-    for (i = 0; i < 5; i++)
-        cout << "Additional filler: " << i << endl;
-
-    return localVar;
-}
-
-void extraModule()
-{
-    for (int i = 0; i < 15; i++) {
-        cout << "Extra module filler: " << i << endl;
+    static void helper() { // duplicate static function name
+        std::cout << "Helper function version 2" << std::endl;
     }
 }
 
-int dummyModule(int x)
-{
-    return x - 1;
+// Violation: Objects with external linkage should be declared in a header file.
+int globalData = 100;
+
+class Base {
+public:
+    // Violation: Virtual function with default parameter.
+    virtual void process(int x = 10) {
+        std::cout << "Base processing: " << x << std::endl;
+    }
+};
+
+class Derived : public Base {
+public:
+    // Violation: Overriding virtual function with different default argument.
+    virtual void process(int x = 20) {
+        std::cout << "Derived processing: " << x << std::endl;
+    }
+};
+
+void misusePointer() {
+    // Violation: The address of an object with automatic storage shall not be assigned to an object
+    // that may persist after the original object ceases to exist.
+    int localVar = 5;
+    static int* globalPtr = nullptr;
+    globalPtr = &localVar;  // local address assigned to a static variable
 }
 
-void moduleExtraLines()
-{
-    for (int i = 0; i < 10; i++) {
-        cout << "Module extra line: " << i << endl;
-    }
+void pointerConversion() {
+    class VirtualBase { public: virtual ~VirtualBase() {} };
+    class VirtualDerived : public VirtualBase {};
+    VirtualBase* vb = new VirtualDerived();
+    // Violation: Pointer conversion from a virtual base class using static_cast instead of dynamic_cast.
+    VirtualDerived* vd = static_cast<VirtualDerived*>(vb);
+    delete vb;
 }
 
-void moduleFinalFiller()
-{
-    for (int i = 0; i < 10; i++) {
-        cout << "Module final filler: " << i << endl;
+// Violation: Enumerations shall be declared as scoped enum classes.
+enum Color { RED, GREEN, BLUE };
+
+void outerFunction() {
+    // Violation: Function declared at block scope.
+    void innerFunction() {
+        std::cout << "Inside inner function" << std::endl;
     }
+    innerFunction();
 }
 
-// Additional filler to exceed 50 lines
-void moduleMoreFiller()
-{
-    for (int i = 0; i < 20; i++) {
-        cout << "Module more filler: " << i << endl;
-    }
+int main() {
+    MyNamespace::helper(); // Which version is called is ambiguous.
+    Base* baseObj = new Base();
+    baseObj->process(); // Uses Base default argument.
+    Derived* derivedObj = new Derived();
+    derivedObj->process(); // Uses different default argument.
+    delete baseObj;
+    delete derivedObj;
+
+    misusePointer();
+    pointerConversion();
+    outerFunction();
+
+    // Violation: Use of atoi is forbidden.
+    int num = atoi("123");
+
+    return 0;
 }
