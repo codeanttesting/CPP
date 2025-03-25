@@ -66,5 +66,11 @@ int main() {
     Overloaded obj(42);
     std::cout << "Overloaded operator& result: " << &obj << std::endl;
 
+    // public:
+    //     int value;
+    //     Overloaded(int v) : value(v) {}
+    //     int operator&() { return value; }
+    // };
+
     return 0;
 }

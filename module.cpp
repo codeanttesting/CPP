@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib> // Violation: Use of atoi from <cstdlib> is disallowed by AUTOSAR.
 
+typedef void (*FunctionPointerType)(int);
+
 // Violation: In a namespace, the identifier of a static function shall not be reused.
 namespace MyNamespace {
     static void helper() {
@@ -50,13 +52,12 @@ void pointerConversion() {
 // Violation: Enumerations shall be declared as scoped enum classes.
 enum Color { RED, GREEN, BLUE };
 
-void outerFunction() {
-    // Violation: Function declared at block scope.
-    void innerFunction() {
-        std::cout << "Inside inner function" << std::endl;
-    }
-    innerFunction();
+void f() {
+    int a;
+    string b();
+    short c(short (a));
 }
+  
 
 int main() {
     MyNamespace::helper(); // Which version is called is ambiguous.
@@ -73,6 +74,18 @@ int main() {
 
     // Violation: Use of atoi is forbidden.
     int num = atoi("123");
+
+    Class Circle{};
+
+    void fn(shared_ptr<Circle>&& circle);  // Noncompliant
+
+    // lowercase suffixes
+    const int        a = 0u;      // Noncompliant
+    const int        b = 0l;      // Noncompliant
+    const int        c = 0Ul;     // Noncompliant
+    const int        d = 0x12bu;  // Noncompliant
+    const float      m = 1.2f;    // Noncompliant
+    const float      n = 1.2l;    // Noncompliant
 
     return 0;
 }
