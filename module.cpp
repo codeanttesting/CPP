@@ -80,11 +80,8 @@ int main() {
     void fn(shared_ptr<Circle>&& circle);  // Noncompliant
 
     // lowercase suffixes
-    const int        a = 0u;      // Noncompliant
     const int        b = 0l;      // Noncompliant
     const int        c = 0Ul;     // Noncompliant
-    const int        d = 0x12bu;  // Noncompliant
-    const float      m = 1.2f;    // Noncompliant
     const float      n = 1.2l;    // Noncompliant
 
     return 0;
