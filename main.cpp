@@ -47,7 +47,7 @@ int main() {
     int mixed = i++ + 5;
 
     // Violation: Use of dynamic_cast (should not be used).
-    class Base { public: virtual ~Base() {} };
+    class Base { public: virtual ~Base() = default; };
     class Derived : public Base {};
     Base* b = new Derived();
     Derived* d = dynamic_cast<Derived*>(b);
