@@ -41,7 +41,7 @@ void misusePointer() {
 }
 
 void pointerConversion() {
-    class VirtualBase { public: virtual ~VirtualBase() {} };
+    class VirtualBase { public: virtual ~VirtualBase() = default; };
     class VirtualDerived : public VirtualBase {};
     VirtualBase* vb = new VirtualDerived();
     // Violation: Pointer conversion from a virtual base class using static_cast instead of dynamic_cast.
